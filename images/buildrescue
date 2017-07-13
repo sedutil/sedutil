@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 # Build a custom tinycore bootable image
 ## define releases for tools
 . conf
@@ -15,6 +15,8 @@ sudo rm -rf ${BUILDTYPE} ; mkdir ${BUILDTYPE} ; cd ${BUILDTYPE}
      -f ../scratch/core.gz -a \
      -f ../scratch/vmlinuz -a \
      -f ../scratch/hdparm.tcz -a \
+     -f ../scratch/kmaps.tcz -a \
+     -f ../scratch/setfont.tcz -a \
      -f ${PROGRAM} \
   ] || { echo " prereqs are not available "; exit 1; }
 #
@@ -36,17 +38,30 @@ echo "label DTA" >>image/boot/extlinux/extlinux.conf
 echo "    kernel /boot/vmlinuz" >>image/boot/extlinux/extlinux.conf
 echo "    initrd /boot/core.gz" >>image/boot/extlinux/extlinux.conf
 echo "    append loglevel=0 libata.allow_tpm=1 tinycore base norestore noswap superuser" >>image/boot/extlinux/extlinux.conf
-## Remaster the initrd 
+## Remaster the initrd
 mkdir core
 cd core
 zcat ../../scratch/core.gz | sudo cpio -i -H newc -d
 cd ..
 sudo mkdir -p core/usr/local/sbin/
-sudo unsquashfs -f -li -d core ../scratch/hdparm.tcz
+sudo unsquashfs -f -d core ../scratch/hdparm.tcz
+sudo unsquashfs -f -d core ../scratch/kmaps.tcz
+sudo unsquashfs -f -d core ../scratch/setfont.tcz
+if [[ -n "$BUILD_KEYMAP" ]]; then
+cat << -END- > core/opt/bootlocal.sh
+#!/bin/sh
+KEYBOARD="$BUILD_KEYMAP"
+loadkmap < "/usr/share/kmap/\$KEYBOARD.kmap" && echo "Keyboard set to \$KEYBOARD" || echo "Keyboard setup for \$KEYBOARD failed."
+kbd_mode -u  # Switch keyboard to UTF-8 mode
+setfont default8x16  # Load font with UTF-8 mapping info (.psfu extension)
+-END-
+chmod a=rx core/opt/bootlocal.sh
+fi
 sudo cp ${PROGRAM} core/usr/local/sbin/
-## Bundle UEFI images
-sudo gunzip -k /sedutil/images/UEFI*/*.gz
-sudo cp /sedutil/images/UEFI*/*.img core/
+## Bundle UEFI images to /root
+for file in /sedutil/images/UEFI*/*.img.gz; do
+    zcat "$file" > core/root/"$(basename ${file%.gz})"
+done
 ## now repackage it
 cd core
 sudo find | sudo cpio -o -H newc | gzip -9 > ../image/boot/core.gz

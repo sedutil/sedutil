@@ -11,6 +11,8 @@ wget ${TCDISTRO}/release/${TINYCORE}
 ##wget ${TCDISTRO}/tcz/ncurses-common.tcz
 wget ${TCDISTRO}/tcz/ncurses.tcz
 wget ${TCDISTRO}/tcz/hdparm.tcz
+wget ${TCDISTRO}/tcz/kmaps.tcz
+wget ${TCDISTRO}/tcz/setfont.tcz
 wget https://www.kernel.org/pub/linux/utils/boot/syslinux/${SYSLINUX}.tar.xz
 ##   Unpack Syslinux
 tar xf ${SYSLINUX}.tar.xz 

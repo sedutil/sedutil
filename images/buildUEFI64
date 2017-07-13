@@ -20,12 +20,26 @@ fi
      -f ../LinuxPBA/dist/${BUILDTYPE}_x86_64/GNU-Linux/linuxpba -a \
      -f ../linux/CLI/dist/${BUILDTYPE}_x86_64/GNU-Linux/sedutil-cli -a \
       -f scratch/buildroot/PBA64/images/bzImage  -a \
-      -f buildroot/syslinux.cfg \
+      -f buildroot/syslinux.cfg -a \
+     -f scratch/kmaps.tcz \
   ] || { echo " prereqs are not available "; exit 1; }
 # recreate the initrd file with the latest PBA
 mkdir -p scratch/buildroot/PBA64/overlay/sbin/
 cp ../LinuxPBA/dist/${BUILDTYPE}_x86_64/GNU-Linux/linuxpba  scratch/buildroot/PBA64/overlay/sbin/linuxpba
 cp ../linux/CLI/dist/${BUILDTYPE}_x86_64/GNU-Linux/sedutil-cli  scratch/buildroot/PBA64/overlay/sbin/sedutil-cli
+if [[ -n "$BUILD_KEYMAP" ]]; then
+mkdir -m u=rwx,go=rx -p scratch/buildroot/PBA64/overlay/etc/init.d
+cat << -END-
+#!/bin/sh
+KEYBOARD="$BUILD_KEYMAP"
+loadkmap < "/usr/share/kmap/\$KEYBOARD.kmap" && echo "Keyboard set to \$KEYBOARD" || { echo "Keyboard setup for \$KEYBOARD failed."; sleep 2; }
+-END-
+else
+echo "# Do not process /etc/init.d scripts"
+fi > scratch/buildroot/PBA64/overlay/etc/init.d/rcS
+echo "# Do not process /etc/init.d scripts" > scratch/buildroot/PBA64/overlay/etc/init.d/rcK
+chmod a=rx scratch/buildroot/PBA64/overlay/etc/init.d/rc?
+sudo unsquashfs -f -d scratch/buildroot/PBA64/overlay scratch/kmaps.tcz
 cd scratch/buildroot
 make all O=PBA64 2>&1 >PBA64.log
 cd ../..
@@ -33,7 +47,7 @@ cd ../..
 sudo rm -rf UEFI64_${BUILDTYPE} ; mkdir UEFI64_${BUILDTYPE} ; cd UEFI64_${BUILDTYPE}
 # make an image file
 dd if=/dev/zero of=${BUILDIMG} bs=1M count=7
-(echo "n";echo "";echo "";echo "";echo "ef00";echo w;echo Y) | gdisk ${BUILDIMG}
+(echo "n"; echo ""; echo ""; echo ""; echo "ef00"; echo w; echo Y) | gdisk ${BUILDIMG}
 
 LOOPDEV=`sudo losetup --show -f -o 1048576 ${BUILDIMG}`
 sudo mkfs.vfat $LOOPDEV -n UEFI64_${BUILDTYPE}

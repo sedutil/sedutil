@@ -25,4 +25,4 @@ ENV LC_ALL en_US.UTF-8
 
 WORKDIR "/sedutil"
 
-CMD "/sedutil/images/autobuild.sh"
+CMD ["/sedutil/images/autobuild.sh","-h"]
