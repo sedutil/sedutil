@@ -7,17 +7,23 @@ Docker can be used as a repeatable build environment to build the images in an U
 
 ### Step 1 - Build the Docker container
 
-    docker build -t sedutil .
+    sudo docker build -t sedutil .
 
 ### Step 2 - Run the build from within the Docker container
 
-Try the `autobuild.sh` script which runs automatically when no command is
-passed:
+To explore build options, run the Docker container without arguments:
 
-    docker run --rm -it -v $PWD/../:/sedutil --privileged sedutil
+    sudo docker run --rm -it -v $PWD/../:/sedutil --privileged sedutil
+
+For a complete build with US keyboard support, run:
+
+    sudo docker run --rm -it -v $PWD/../:/sedutil --privileged sedutil /sedutil/images/autobuild.sh complete
+
+To rebuild with German keyboard support, run:
+
+    sudo docker run --rm -it -v $PWD/../:/sedutil --privileged sedutil /sedutil/images/autobuild.sh -k qwertz/de-latin1 images dist
 
 Or, refer to `BUILDING` file and run manually in the Docker container by
 starting `bash`:
 
-    docker run --rm -it -v $PWD/../:/sedutil --privileged sedutil bash
-
+    sudo docker run --rm -it -v $PWD/../:/sedutil --privileged sedutil bash
