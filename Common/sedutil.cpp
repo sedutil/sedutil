@@ -29,6 +29,8 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+sedutiloutput output_format;
+
 int diskScan()
 {
 	char devname[25];
@@ -124,6 +126,8 @@ int main(int argc, char * argv[])
 		}
 		// make sure DtaDev::no_hash_passwords is initialized
 		d->no_hash_passwords = opts.no_hash_passwords;
+
+		d->output_format = opts.output_format;
 	}
 
     switch (opts.action) {
@@ -287,8 +291,7 @@ int main(int argc, char * argv[])
 		break;
     case sedutiloption::printDefaultPassword:
 		LOG(D) << "print default password";
-        d->printDefaultPassword();
-        return 0;
+        return d->printDefaultPassword();
         break;
 	case sedutiloption::rawCmd:
 		LOG(D) << "Performing cmdDump ";
