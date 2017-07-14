@@ -24,6 +24,6 @@ This program and it's accompanying Pre-Boot Authorization image allow
 you to enable the locking in SED's that comply with the TCG OPAL 2.00
 standard on bios machines.
 
-**Note:** sedutil does support standby (aka S3, STR, suspend to RAM). If you want to use it on desktop systems where STR was previously used, configure these for hibernation instead.   
+**Note:** sedutil does not support standby (aka S3, STR, suspend to RAM). If you want to use it on desktop systems where STR was previously used, configure these for hibernation instead.   
 
 See the [wiki](https://github.com/sedutil/sedutil/wiki) for information on how to obtain and use sedutil.
