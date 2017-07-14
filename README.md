@@ -22,17 +22,8 @@ sedutil - The Drive Trust Alliance Self Encrypting Drive Utility
 
 This program and it's accompanying Pre-Boot Authorization image allow
 you to enable the locking in SED's that comply with the TCG OPAL 2.00
-standard on bios machines.   
+standard on bios machines.
 
-You must be administrator/root to run the host managment program
+**Note:** sedutil does not support standby (aka S3, STR, suspend to RAM). If you want to use it on desktop systems where STR was previously used, configure these for hibernation instead.   
 
-In Linux libata.allow_tpm must be set to 1. Either via adding libata.allow_tpm=1 to the kernel flags at boot time 
-or changing the contents of /sys/module/libata/parameters/allow_tpm to a from a "0" to a "1" on a running system.
-
-***** sleep (S3) is not supported.
-
-Source code is available on GitHub at https://github.com/Drive-Trust-Alliance/sedutil 
-
-Linux and Windows executables are available at https://github.com/Drive-Trust-Alliance/sedutil/wiki/Executable-Distributions
-
-If you are looking for the PSID revert function see linux/PSIDRevert_LINUX.txt or win32/PSIDRevert_WINDOWS.txt
+See the [wiki](https://github.com/sedutil/sedutil/wiki) for information on how to obtain and use sedutil.
